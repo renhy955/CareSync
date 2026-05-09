@@ -5,6 +5,9 @@ import { onAuthStateChanged, sendPasswordResetEmail } from "firebase/auth"; // 1
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { allUsers as initialAllUsers, addUser } from "../data/dummyData";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const AUTH_API_BASE_URL = API_BASE_URL ? `${API_BASE_URL}/api/auth` : "/api/auth";
+
 const db = getFirestore();
 const AuthContext = createContext();
 
@@ -71,8 +74,8 @@ export const AuthProvider = ({ children }) => {
         if (token && storedUser) {
           // Verify token with backend
           try {
-            const response = await fetch('http://localhost:5000/api/auth/me', {
-              headers: { 'Authorization': `Bearer ${token}` },
+            const response = await fetch(`${AUTH_API_BASE_URL}/me`, {
+              headers: { Authorization: `Bearer ${token}` },
             });
             if (response.ok) {
               const userData = JSON.parse(storedUser);
@@ -185,9 +188,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password, role) => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch(`${AUTH_API_BASE_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
@@ -222,9 +225,9 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     const { firstName, lastName, email, password, role = "patient" } = userData;
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch(`${AUTH_API_BASE_URL}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: `${firstName} ${lastName}`,
           email,

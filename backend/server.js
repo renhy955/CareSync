@@ -24,22 +24,34 @@ connectDB();
 const app= express();
 const server = http.createServer(app);
 
+const allowedOrigins = [
+  "http://localhost",
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "http://localhost:8080",
+];
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  credentials: true,
+};
+
 const io = new Server(server, {
-  cors: {
-    origin: ["http://localhost:5173", "http://localhost:3000"], // dono allow
-    methods: ["GET", "POST"],
-    credentials: true
-  }
+  cors: corsOptions,
 });
 
 
 handleSocketConnection(io);
 
 app.use(express.json());
-app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:3000"],
-  credentials: true
-}));
+app.use(cors(corsOptions));
 
 app.use(morgan("dev"));
 

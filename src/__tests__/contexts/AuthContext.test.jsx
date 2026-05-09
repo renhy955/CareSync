@@ -4,6 +4,8 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AuthProvider, useAuth } from '../../contexts/AuthContext';
 
+vi.stubEnv('VITE_API_URL', '');
+
 // Mock Firebase
 vi.mock('../../firebase', () => ({
   auth: {},
@@ -156,7 +158,7 @@ describe('AuthContext', () => {
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith(
-          'http://localhost:5000/api/auth/login',
+          '/api/auth/login',
           expect.objectContaining({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -179,7 +181,7 @@ describe('AuthContext', () => {
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith(
-          'http://localhost:5000/api/auth/register',
+          '/api/auth/register',
           expect.objectContaining({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
